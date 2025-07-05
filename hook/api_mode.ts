@@ -8,45 +8,39 @@ export async function sendHook(
     groupedCall: { a: FingerUnit[]; b: FingerUnit[]; c: FingerUnit[]; d: FingerUnit[] },
     groupedQueue: { a: FingerUnit[]; b: FingerUnit[]; c: FingerUnit[]; d: FingerUnit[] }
 ): Promise<void> {
+    const poliKeys = ['a', 'b', 'c', 'd'] as const;
+    const sortedPoliKeys = poliKeys.slice().sort((a, b) => {
+        const waktu1 = groupedCall[a].at(-1)?.Waktu ?? '';
+        const waktu2 = groupedCall[b].at(-1)?.Waktu ?? '';
+
+        return waktu2.localeCompare(waktu1);
+    });
+
     // get previous queue
     const { call: prevCall, queue: prevQueue } = await getLastAntrian();
 
-    ['a', 'b', 'c', 'd'].forEach((poliKey) => {
-        const currentCalled = groupedCall[poliKey as keyof typeof groupedCall];
-        const currentQueue = groupedQueue[poliKey as keyof typeof groupedQueue];
-        const totalQueue = currentCalled.length + currentQueue.length;
+    sortedPoliKeys.forEach((poliKey) => {
+        const totalQueue = groupedCall[poliKey].length + groupedQueue[poliKey].length;
 
-        // cache
-        const prevQueueList = prevQueue[poliKey as keyof typeof prevQueue];
-
-        if (currentQueue.at(-1)?.Kode || prevQueueList.at(-1)?.Kode) {
-            console.log(`[INFO] data not sent, queue avilable`);
-            return;
-        }
-
-        // send only have queen (prevent duplicate send)
-        if ( currentCalled.length > prevQueueList.length) {
+        if (groupedQueue[poliKey].at(-1)?.Kode !== prevQueue[poliKey].at(-1)?.Kode) {
             console.log(`[INFO] send poli ${poliKey} with total queue is ${totalQueue}`);
 
             fetch(`${API_URL}baru?poli=${poliKey.toUpperCase()}&antrian=${totalQueue}`)
                 .then()
                 .catch(console.error);
 
-            return
+            return;
         }
-
 
         console.log(`[WARM] data not sent, poli ${poliKey} have ${totalQueue}`);
     });
 
-    ['a', 'b', 'c', 'd'].forEach((poliKey) => {
-        const currentCalled = groupedCall[poliKey as keyof typeof groupedCall];
-        const lastCalledKode = currentCalled.at(-1)?.Kode;
+    sortedPoliKeys.forEach((poliKey) => {
+        const lastCalledKode = groupedCall[poliKey].at(-1)?.Kode;
         const lastCalledNumber = lastCalledKode ? parseInt(lastCalledKode.replace(/^[a-zA-Z]+/, ''), 10) : undefined;
 
         // cache
-        const prevCalledList = prevCall[poliKey as keyof typeof prevCall];
-        const prevCalledKode = prevCalledList.at(-1)?.Kode;
+        const prevCalledKode = prevCall[poliKey].at(-1)?.Kode;
 
         if ((lastCalledKode !== undefined && prevCalledKode !== undefined) && prevCalledKode === lastCalledKode) {
             console.log(`[INFO] data not sent, ${lastCalledKode} not changed. ${prevCalledKode}`);
@@ -71,7 +65,7 @@ export async function sendHook(
 
 async function getLastAntrian() {
     const antrianResponse = await fetch(`${API_URL}antrian`);
-    if (!antrianResponse.ok) {
+    if (false === antrianResponse.ok) {
         throw new Error(`Failed to fetch antrian: ${antrianResponse.status} ${antrianResponse.statusText}`);
     }
 
@@ -91,7 +85,6 @@ function mapToFingerUnits(data: any[]): FingerUnit[] {
         const units: FingerUnit[] = [];
         if (item.current > 0) {
             units.push({
-                //
                 Kode: `${item.poli}${String(item.current).padStart(3, "0")}`,
                 Status: 'sudah',
                 Waktu: formatTime(item.current_times),
