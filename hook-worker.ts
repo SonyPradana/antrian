@@ -1,6 +1,3 @@
-import { config } from 'dotenv'
-config()
-
 import { getFingerUnitsByDate } from './model/finger_unit'
 import { sendHook as send } from './hook/api_mode'
 

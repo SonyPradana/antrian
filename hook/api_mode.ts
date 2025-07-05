@@ -1,7 +1,14 @@
 import type { FingerUnit } from '../model/finger_unit'
 import { groupByKodePrefix } from '../hook-worker'
+import { config } from '../config/hook'
 
-const API_URL = process.env.API_URL!
+const log_date = new Date().toISOString()
+
+export async function reset() {
+    await fetch(`${config.api.reset_url}?poli=full_reset`)
+        .then()
+        .catch(() => console.log(`[WARM] ${log_date}: cant reset antrian poli`))
+}
 
 export async function sendHook(
     date: string,
@@ -23,16 +30,16 @@ export async function sendHook(
         const totalQueue = groupedCall[poliKey].length + groupedQueue[poliKey].length;
 
         if (groupedQueue[poliKey].at(-1)?.Kode !== prevQueue[poliKey].at(-1)?.Kode) {
-            console.log(`[INFO] send poli ${poliKey} with total queue is ${totalQueue}`);
+            console.log(`[INFO] ${log_date}: send poli ${poliKey} with total queue is ${totalQueue}`);
 
-            fetch(`${API_URL}baru?poli=${poliKey.toUpperCase()}&antrian=${totalQueue}`)
+            fetch(`${config.api.queue_url}?poli=${poliKey.toUpperCase()}&antrian=${totalQueue}`)
                 .then()
                 .catch(console.error);
 
             return;
         }
 
-        console.log(`[WARM] data not sent, poli ${poliKey} have ${totalQueue}`);
+        console.log(`[WARM] ${log_date}: data not sent, poli ${poliKey} have ${totalQueue}`);
     });
 
     sortedPoliKeys.forEach((poliKey) => {
@@ -43,28 +50,28 @@ export async function sendHook(
         const prevCalledKode = prevCall[poliKey].at(-1)?.Kode;
 
         if ((lastCalledKode !== undefined && prevCalledKode !== undefined) && prevCalledKode === lastCalledKode) {
-            console.log(`[INFO] data not sent, ${lastCalledKode} not changed. ${prevCalledKode}`);
+            console.log(`[INFO] ${log_date}: data not sent, ${lastCalledKode} not changed. ${prevCalledKode}`);
             return;
         }
 
         if (lastCalledNumber !== undefined) {
-            console.log(`[INFO] send poli ${poliKey} with last call is ${lastCalledNumber}`);
+            console.log(`[INFO] ${log_date}: send poli ${poliKey} with last call is ${lastCalledNumber}`);
 
-            fetch(`${API_URL}dipanggil?poli=${poliKey.toUpperCase()}&antrian=${lastCalledNumber}`)
+            fetch(`${config.api.called_url}?poli=${poliKey.toUpperCase()}&antrian=${lastCalledNumber}`)
                 .then()
                 .catch(console.error);
 
             return;
         }
 
-        console.log(`[INFO] data not sent, poli ${poliKey} has empty call`);
+        console.log(`[INFO] ${log_date}: data not sent, poli ${poliKey} has empty call`);
     });
 
     return;
 }
 
 async function getLastAntrian() {
-    const antrianResponse = await fetch(`${API_URL}antrian`);
+    const antrianResponse = await fetch(`${config.api.gets_url}`);
     if (false === antrianResponse.ok) {
         throw new Error(`Failed to fetch antrian: ${antrianResponse.status} ${antrianResponse.statusText}`);
     }

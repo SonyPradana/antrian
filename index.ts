@@ -1,13 +1,11 @@
+import { config as env } from 'dotenv'
+env()
+
 import { sendHook } from './hook-worker'
-
-const API_URL = process.env.API_URL!
-const interval = Number(process.env.INTERVAL_MS || 60000)
-
-// first reset all
-fetch(`${API_URL}reset?poli=full_reset`)
-    .then()
-    .catch(() => console.log('[WARM] cant reset antrian poli'))
+import { config } from './config/hook'
+import { reset } from './hook/api_mode'
 
 // lets go!!!
+reset()
 sendHook()
-setInterval(sendHook, interval)
+setInterval(sendHook, config.common.interval)

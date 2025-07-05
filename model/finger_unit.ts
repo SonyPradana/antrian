@@ -1,4 +1,10 @@
-import { db } from '../db'
+import { db } from '../connection'
+
+export type FingerUnit = {
+    Kode: string;
+    Status: string;
+    Waktu: string;
+};
 
 export async function getFingerUnitsByDate(unit: number, date: string): Promise<FingerUnit[]> {
     const [rows] = await db.query(`
@@ -20,9 +26,3 @@ export async function getFingerUnitsByDate(unit: number, date: string): Promise<
 
     return rows as FingerUnit[];
 }
-
-export type FingerUnit = {
-    Kode: string;
-    Status: string;
-    Waktu: string;
-};
