@@ -34,7 +34,7 @@ export async function sendHook(
         const x2 = prevQueue[poliKey].at(-1)?.Kode;
         const y2 = x2 ? parseInt(x2.replace(/^[a-zA-Z]+/, ''), 10) : undefined;
 
-        if (Number(y2) != totalQueue) {
+        if (totalQueue && Number(y2) != totalQueue) {
             console.log(`  [OK] ${getDate()}: send poli ${poliKey} with total queue is ${totalQueue} and new queue is ${y2}`);
             fetch(`${config.api.queue_url}?poli=${poliKey.toUpperCase()}&antrian=${totalQueue}`)
                 .then()
