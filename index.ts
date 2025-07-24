@@ -3,9 +3,9 @@ env()
 
 import { sendHook } from './hook-worker'
 import { config } from './config/hook'
-import { reset } from './hook/api_mode'
+import { reset } from './hook/hook_mode'
 
 // lets go!!!
-reset()
-sendHook()
+await reset()
+await sendHook()
 setInterval(sendHook, config.common.interval)

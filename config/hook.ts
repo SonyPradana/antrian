@@ -5,7 +5,7 @@ export const config = {
         interval: Number(process.env.INTERVAL_MS) ?? 30_000,
     },
     hook: {
-        url: process.env.API_URL ?? 'http://localhost/hook'
+        url: process.env.HOOK_URL ?? 'http://localhost/hook'
     },
     api: {
         url: base_api_url,

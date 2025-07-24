@@ -1,5 +1,5 @@
 import { getFingerUnitsByDate } from './model/finger_unit'
-import { sendHook as send } from './hook/api_mode'
+import { sendHook as send } from './hook/hook_mode'
 
 import type { FingerUnit } from './model/finger_unit'
 
@@ -23,7 +23,10 @@ export async function sendHook() {
     const antrian_call = anttrian.filter(row => row.Status.toLowerCase() === 'sudah')
     const antrian_queue = anttrian.filter(row => row.Status.toLowerCase() === 'belum')
 
-    send(date, groupByKodePrefix(antrian_call), groupByKodePrefix(antrian_queue))
+    send(
+      groupByKodePrefix(antrian_call),
+      groupByKodePrefix(antrian_queue)
+    )
 
     return JSON.stringify(anttrian)
   } catch (err) {

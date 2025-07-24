@@ -13,7 +13,6 @@ export async function reset() {
 }
 
 export async function sendHook(
-    date: string,
     groupedCall: { a: FingerUnit[]; b: FingerUnit[]; c: FingerUnit[]; d: FingerUnit[] },
     groupedQueue: { a: FingerUnit[]; b: FingerUnit[]; c: FingerUnit[]; d: FingerUnit[] }
 ): Promise<void> {
@@ -126,7 +125,7 @@ function formatTime(time: string | number): string {
     return `${hh}:${mm}`;
 }
 
-function getDate(
+export function getDate(
     timeZone: string = 'Asia/Jakarta',
     date: Date = new Date(),
     locale: string = 'en-US'

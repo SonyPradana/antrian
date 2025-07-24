@@ -11,7 +11,7 @@ export async function getFingerUnitsByDate(unit: number, date: string): Promise<
         SELECT
             finger_unit.Kode,
             finger_unit.Status,
-            DATE_FORMAT(finger_unit.TanggalFingger, '%h:%i') as Waktu
+            DATE_FORMAT(finger_unit.TanggalFingger, '%h:%i:%s %p') as Waktu
         FROM
             finger_unit
             LEFT JOIN units ON units.unit = finger_unit.UnitID
