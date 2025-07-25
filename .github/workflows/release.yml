@@ -20,10 +20,10 @@ jobs:
       - name: Build EXE
         run: |
           mkdir dist
-          bun build src/index.ts --compile --outfile dist/antrian.exe
+          bun build src/index.ts --compile --outfile dist/antrian
 
       - name: Copy .env.example
-        run: cp .env.example dist/
+        run: Copy-Item .env.example dist/
 
       - name: Archive files
         run: Compress-Archive -Path dist/* -DestinationPath antrian-${{ github.ref_name }}.zip
