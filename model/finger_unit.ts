@@ -1,13 +1,17 @@
-import { db } from '../connection'
+import { db } from '../connection';
 
 export type FingerUnit = {
-    Kode: string;
-    Status: string;
-    Waktu: string;
+  Kode: string;
+  Status: string;
+  Waktu: string;
 };
 
-export async function getFingerUnitsByDate(unit: number, date: string): Promise<FingerUnit[]> {
-    const [rows] = await db.query(`
+export async function getFingerUnitsByDate(
+  unit: number,
+  date: string,
+): Promise<FingerUnit[]> {
+  const [rows] = await db.query(
+    `
         SELECT
             finger_unit.Kode,
             finger_unit.Status,
@@ -22,7 +26,9 @@ export async function getFingerUnitsByDate(unit: number, date: string): Promise<
         ORDER BY
             finger_unit.Status ASC,
             finger_unit.TanggalFingger ASC
-        `, [unit, '%' + date + '%']);
+        `,
+    [unit, '%' + date + '%'],
+  );
 
-    return rows as FingerUnit[];
+  return rows as FingerUnit[];
 }
